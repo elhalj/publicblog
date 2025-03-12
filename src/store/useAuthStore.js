@@ -48,7 +48,15 @@ export const useAuthStore = create((set) => ({
     try {
       const response = await axios.post(`${API_URL}/login`, data);
       localStorage.setItem("token", response.data.token); // Ajoutez cette ligne
-      set({ authUser: response.data.user }); // Supposons que le backend renvoie { user, token }
+      // Récupération des données utilisateur
+      const userResponse = await axios.get(`${API_URL}/me`, {
+        headers: { Authorization: `Bearer ${response.data.token}` },
+      });
+      // Mise à jour synchrone de l'état
+      set({
+        authUser: userResponse.data.user,
+        isLogin: false,
+      });
       toast.success("Connecte avec succes");
     } catch (error) {
       set({ authUser: null });
