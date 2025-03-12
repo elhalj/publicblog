@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAuthStore } from '../../store/useAuthStore'
-import ListeArticle from '../../components/users/[Id]/ListeArticle';
+import ListeArticle from '../../components/users/ListeArticle';
 import { useAuthArticleStore } from '../../store/useAuthArticleStore';
 import ButtonAdd from '../../components/users/ButtonAdd';
 import { useNavigate } from 'react-router-dom';
