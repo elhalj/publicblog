@@ -23,11 +23,11 @@ export default function App() {
       <Sidebar />
       <Routes>
         <Route path='/' element={<Acceuil />} />
-        <Route path='/login' element={!authUser ? <Login /> : <Navigate to="/dashboard/user" replace />} />
-        <Route path='/signup' element={!authUser ? <SignUp /> : <Navigate to="/login" replace />} />
-        <Route path='/dashboard/user' element={authUser ? <Page /> : <Navigate to="/login" replace />} />
-        <Route path="/articles/new" element={authUser ? <AddArticle /> : <Navigate to="/login" replace />} />
-        <Route path="/articles/:id/edit" element={authUser ? <EditArticle /> : <Navigate to="/login" replace />} />
+        <Route path='/login' element={!authUser ? <Login /> : <Navigate to={"/dashboard/user"} />} />
+        <Route path='/signup' element={!authUser ? <SignUp /> : <Navigate to={"/login"} />} />
+        <Route path='/dashboard/user' element={authUser ? <Page /> : <Navigate to={"/login"} />} />
+        <Route path="/articles/new" element={authUser ? <AddArticle /> : <Navigate to={"/login"} />} />
+        <Route path="/articles/:id/edit" element={authUser ? <EditArticle /> : <Navigate to={"/login"} />} />
       </Routes>
     </>
 

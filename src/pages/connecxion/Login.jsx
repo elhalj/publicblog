@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import { useAuthStore } from '../../store/useAuthStore'
 import toast from 'react-hot-toast'
 import { Loader2 } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+// import { useNavigate } from 'react-router-dom'
 
 function Login() {
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
     const { login, isLogin } = useAuthStore()
     const [formData, setFormData] = useState({
         email: "",
@@ -31,13 +31,19 @@ function Login() {
         return true
     }
 
+    // useEffect(() => {
+    //     if (authUser) {
+    //         navigate('/dashboard/user');
+    //     }
+    // }, [authUser, navigate]);
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         if (!validateForm()) return
 
         try {
             await login(formData)
-            navigate('/dashboard/user');
+            // navigate('/dashboard/user');
             setFormData(prev => ({ ...prev, password: "" })) // Réinitialisation du mot de passe
         } catch (error) {
             console.error(error.message)
