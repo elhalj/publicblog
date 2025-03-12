@@ -11,15 +11,20 @@ export const useAuthStore = create((set) => ({
   isLogout: false,
   isCheckingAuth: true,
 
+  // Dans useAuthStore.js
   checkAuth: async () => {
     try {
-      const response = await axios.get(`${API_URL}/checkAuth`);
-      set({ authUser: response.data });
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await axios.get(`${API_URL}/checkAuth`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      set({ authUser: response.data.user });
     } catch (error) {
+      localStorage.removeItem("token");
       set({ authUser: null });
-      console.log("Erreur de vérification d'authentification:", error.message);
-    } finally {
-      set({ isCheckingAuth: false });
     }
   },
 

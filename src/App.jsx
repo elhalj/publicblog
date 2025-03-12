@@ -12,13 +12,9 @@ import { useAuthStore } from './store/useAuthStore';
 import { useEffect } from 'react';
 
 export default function App() {
-  const { checkAuth, authUser } = useAuthStore()
+  const { authUser } = useAuthStore()
 
-  useEffect(() => {
-    checkAuth();
-  }, [])
 
-  console.log(authUser)
 
   return (
     <>

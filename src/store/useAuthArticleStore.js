@@ -21,19 +21,30 @@ export const useAuthArticleStore = create((set) => ({
     }
   },
 
-  // useAuthArticleStore.js (correction)
-  getUserArticles: async () => {
+  getUserArticles: async (userId) => {
     try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Token manquant");
+
       const response = await axios.get(`${VITE_API_ARTICLE_URL}/mesArticles`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { Authorization: `Bearer ${token}` },
+        params: { userId }, // Envoyer explicitement l'ID utilisateur
       });
-      // ✅ Force le résultat à être un tableau
-      console.log("Réponse API /mesArticles :", response.data);
-      set({ userArticles: Array.isArray(response.data) ? response.data : [] });
+
+      // Validation de la réponse
+      if (!response.data?.success) {
+        throw new Error("Format de réponse API invalide");
+      }
+
+      set({
+        userArticles: Array.isArray(response.data.data)
+          ? response.data.data
+          : [],
+      });
     } catch (error) {
-      set({ userArticles: [] }); // Réinitialisation explicite
-      toast.error("Erreur de récupération des articles");
-      console.error("Erreur API /mesArticles :", error);
+      console.error("Échec de la récupération:", error);
+      toast.error(error.response?.data?.message || error.message);
+      set({ userArticles: [] });
     }
   },
 

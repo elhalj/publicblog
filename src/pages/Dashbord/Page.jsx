@@ -13,25 +13,46 @@ function Page() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             // verification de l'authentification
+    //             await checkAuth()
+
+    //             // recuperer des article si l'utilisateur est connecte
+    //             await getUserArticles()
+
+    //         } catch (error) {
+    //             setError("Erreur de chargement du dashbord")
+    //             console.log("Erreur Dashbord: ", error)
+    //         } finally {
+    //             setLoading(false); // Ajoutez cette ligne
+    //         }
+    //     }
+    //     fetchData()
+
+    // }, [checkAuth, getUserArticles])
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // verification de l'authentification
-                await checkAuth()
+                setLoading(true);
+                await checkAuth();
 
-                // recuperer des article si l'utilisateur est connecte
-                await getUserArticles()
+                if (authUser?._id) {
+                    await getUserArticles(authUser._id); // Passer l'ID explicitement
+                }
 
             } catch (error) {
-                setError("Erreur de chargement du dashbord")
-                console.log("Erreur Dashbord: ", error)
+                setError("Erreur de chargement");
+                console.error("Erreur:", error);
+                navigate("/login"); // Redirection si échec
             } finally {
-                setLoading(false); // Ajoutez cette ligne
+                setLoading(false);
             }
-        }
-        fetchData()
+        };
 
-    }, [checkAuth, getUserArticles])
+        fetchData();
+    }, [authUser?._id, navigate, checkAuth, getUserArticles]);
     console.log(userArticles)
 
     if (loading) {
@@ -62,12 +83,15 @@ function Page() {
 
             <div className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4">Vos Articles</h2>
-                {userArticles.length === 0 ? (
-                    <div className="text-gray-500 text-center py-8">
-                        Aucun article trouvé. Commencez par en créer un !
-                    </div>
-                ) : (
+                {userArticles?.length ? (
                     <ListeArticle userArticles={userArticles} />
+                ) : (
+                    <div className="text-center py-8">
+                        <img src="/empty-state.svg" alt="Aucun article" className="mx-auto w-48" />
+                        <p className="mt-4 text-gray-500">
+                            Commencez par créer votre premier article !
+                        </p>
+                    </div>
                 )}
             </div>
         </div>
