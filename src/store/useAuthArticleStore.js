@@ -26,12 +26,12 @@ export const useAuthArticleStore = create((set) => ({
     try {
       const response = await axios.get(`${VITE_API_ARTICLE_URL}/mesArticles`);
       set({
-        userArticles: Array.isArray(response.data) ? response.data : [],
+        userArticles: response.data,
       });
     } catch (error) {
       console.error("Échec de la récupération:", error);
-      toast.error(error.response?.data?.message || error.message);
       set({ userArticles: [] });
+      toast.error(error.response?.data?.message || error.message);
     } finally {
       set({ isArticleLoading: false });
     }
