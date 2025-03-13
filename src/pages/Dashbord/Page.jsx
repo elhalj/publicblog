@@ -37,7 +37,7 @@ function Page() {
             try {
                 setLoading(true);
 
-                if (authUser?._id) {
+                if (authUser) {
                     await getUserArticles(); // Passer l'ID explicitement
                 }
 
@@ -51,7 +51,7 @@ function Page() {
         };
 
         fetchData();
-    }, [authUser?._id, navigate, getUserArticles]);
+    }, [authUser, navigate, getUserArticles]);
     console.log(userArticles)
 
     if (loading && isArticleLoading) {
