@@ -21,30 +21,19 @@ export const useAuthArticleStore = create((set) => ({
     }
   },
 
-  getUserArticles: async (userId) => {
+  getUserArticles: async () => {
+    set({ isArticleLoading: true });
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Token manquant");
-
-      const response = await axios.get(`${VITE_API_ARTICLE_URL}/mesArticles`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { userId }, // Envoyer explicitement l'ID utilisateur
-      });
-
-      // Validation de la réponse
-      if (!response.data?.success) {
-        throw new Error("Format de réponse API invalide");
-      }
-
+      const response = await axios.get(`${VITE_API_ARTICLE_URL}/mesArticles`);
       set({
-        userArticles: Array.isArray(response.data.data)
-          ? response.data.data
-          : [],
+        userArticles: Array.isArray(response.data) ? response.data.data : [],
       });
     } catch (error) {
       console.error("Échec de la récupération:", error);
       toast.error(error.response?.data?.message || error.message);
       set({ userArticles: [] });
+    } finally {
+      set({ isArticleLoading: false });
     }
   },
 
@@ -84,15 +73,10 @@ export const useAuthArticleStore = create((set) => ({
     }
   },
 
-  updateArticle: async (articleId, updates) => {
+  updateArticle: async (articleId) => {
+    set({ isArticleLoading: true });
     try {
-      const response = await axios.put(
-        `${VITE_API_ARTICLE_URL}/${articleId}`,
-        updates,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      const response = await axios.put(`${VITE_API_ARTICLE_URL}/${articleId}`);
       //   set({ articles: response.data });
       set((state) => ({
         articles: state.articles.map((article) =>
@@ -103,17 +87,16 @@ export const useAuthArticleStore = create((set) => ({
         ),
       }));
       toast.success("Modifier avec success");
-      return response.data;
     } catch (error) {
       toast.error(error.response.data.message);
+    } finally {
+      set({ isArticleLoading: false });
     }
   },
 
   deleteArticle: async (articleId) => {
     try {
-      await axios.delete(`${VITE_API_ARTICLE_URL}/${articleId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      await axios.delete(`${VITE_API_ARTICLE_URL}/${articleId}`);
       //   set({ articles: response.data });
       set((state) => ({
         articles: state.articles.filter((article) => article._id !== articleId),

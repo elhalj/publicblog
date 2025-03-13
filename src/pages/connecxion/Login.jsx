@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { /*useEffect,*/ useState } from 'react'
 import { useAuthStore } from '../../store/useAuthStore'
 import toast from 'react-hot-toast'
 import { Loader2 } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+// import { useNavigate } from 'react-router-dom'
 // import { useNavigate } from 'react-router-dom'
 
 function Login() {
-    const navigate = useNavigate()
-    const { login, isLogin, authUser } = useAuthStore()
+    // const navigate = useNavigate()
+    const { login, isLogin, /*authUser*/ } = useAuthStore()
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -32,11 +32,11 @@ function Login() {
         return true
     }
 
-    useEffect(() => {
-        if (authUser) {
-            navigate('/dashboard/user');
-        }
-    }, [authUser, navigate]);
+    // useEffect(() => {
+    //     if (authUser) {
+    //         navigate('/dashboard/user');
+    //     }
+    // }, [authUser, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault()

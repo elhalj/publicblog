@@ -39,7 +39,7 @@ function Page() {
                 await checkAuth();
 
                 if (authUser?._id) {
-                    await getUserArticles(authUser._id); // Passer l'ID explicitement
+                    await getUserArticles(); // Passer l'ID explicitement
                 }
 
             } catch (error) {

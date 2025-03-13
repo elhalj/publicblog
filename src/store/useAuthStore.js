@@ -14,17 +14,13 @@ export const useAuthStore = create((set) => ({
   // Dans useAuthStore.js
   checkAuth: async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const response = await axios.get(`${API_URL}/checkAuth`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      set({ authUser: response.data.user });
+      const response = await axios.get(`${API_URL}/checkAuth`);
+      set({ authUser: response.data });
     } catch (error) {
-      localStorage.removeItem("token");
       set({ authUser: null });
+      console.log("Erreur de check", error.message);
+    } finally {
+      set({ isCheckingAuth: false });
     }
   },
 
@@ -39,7 +35,7 @@ export const useAuthStore = create((set) => ({
       const errorMessage = error.response?.data?.message || "Erreur inconnue";
       toast.error(errorMessage);
     } finally {
-      set({ isSignup: false });
+      set({ isCheckingAuth: false, isSignup: false });
     }
   },
 
@@ -47,8 +43,7 @@ export const useAuthStore = create((set) => ({
     set({ isLogin: true });
     try {
       const response = await axios.post(`${API_URL}/login`, data);
-      localStorage.setItem("token", response.data.token); // Ajoutez cette ligne
-      set({ authUser: response.data.user }); // Supposons que le backend renvoie { user, token }
+      set({ authUser: response.data }); // Supposons que le backend renvoie { user, token }
       toast.success("Connecte avec succes");
     } catch (error) {
       set({ authUser: null });
@@ -56,12 +51,11 @@ export const useAuthStore = create((set) => ({
         error.response?.data?.message || "Erreur de connexion";
       toast.error(errorMessage);
     } finally {
-      set({ isLogin: false });
+      set({ isCheckingAuth: false, isLogin: false });
     }
   },
 
   logout: async () => {
-    set({ isLogout: true });
     try {
       await axios.post(`${API_URL}/logout`);
       set({ authUser: null });
@@ -70,8 +64,6 @@ export const useAuthStore = create((set) => ({
       const errorMessage =
         error.response?.data?.message || "Erreur de déconnexion";
       toast.error(errorMessage);
-    } finally {
-      set({ isLogout: false });
     }
   },
 
