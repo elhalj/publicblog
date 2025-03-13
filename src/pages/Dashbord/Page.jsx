@@ -8,8 +8,8 @@ import { Loader2 } from 'lucide-react';
 
 function Page() {
     const navigate = useNavigate()
-    const { checkAuth, authUser } = useAuthStore();
-    const { userArticles, getUserArticles } = useAuthArticleStore()
+    const { authUser } = useAuthStore();
+    const { userArticles, getUserArticles, isArticleLoading } = useAuthArticleStore()
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
@@ -36,7 +36,6 @@ function Page() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                await checkAuth();
 
                 if (authUser?._id) {
                     await getUserArticles(); // Passer l'ID explicitement
@@ -52,10 +51,10 @@ function Page() {
         };
 
         fetchData();
-    }, [authUser?._id, navigate, checkAuth, getUserArticles]);
+    }, [authUser?._id, navigate, getUserArticles]);
     console.log(userArticles)
 
-    if (loading) {
+    if (loading && isArticleLoading) {
         return (
             <div className="space-y-4">
                 <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse"></div>
