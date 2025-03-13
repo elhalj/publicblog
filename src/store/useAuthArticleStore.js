@@ -26,7 +26,7 @@ export const useAuthArticleStore = create((set) => ({
     try {
       const response = await axios.get(`${VITE_API_ARTICLE_URL}/mesArticles`);
       set({
-        userArticles: Array.isArray(response.data) ? response.data.data : [],
+        userArticles: Array.isArray(response.data) ? response.data : [],
       });
     } catch (error) {
       console.error("Échec de la récupération:", error);
