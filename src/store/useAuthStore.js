@@ -13,12 +13,23 @@ export const useAuthStore = create((set) => ({
 
   // Dans useAuthStore.js
   checkAuth: async () => {
+    set({ isCheckingAuth: true });
     try {
-      const response = await axios.get(`${API_URL}/checkAuth`);
-      set({ authUser: response.data });
+      const response = await axios.get(`${API_URL}/checkAuth`, {
+        withCredentials: true, // Nécessaire pour les cookies
+      });
+
+      if (response.data.success) {
+        set({ authUser: response.data.user });
+      } else {
+        set({ authUser: null });
+      }
     } catch (error) {
+      console.error(
+        "Erreur checkAuth:",
+        error.response?.data?.message || error.message
+      );
       set({ authUser: null });
-      console.log("Erreur de check", error.message);
     } finally {
       set({ isCheckingAuth: false });
     }
@@ -42,7 +53,11 @@ export const useAuthStore = create((set) => ({
   login: async (data) => {
     set({ isLogin: true });
     try {
-      const response = await axios.post(`${API_URL}/login`, data);
+      const response = await axios.post(`${API_URL}/login`, data, {
+        withCredentials: true, // Envoie les cookies
+      });
+      // Appel checkAuth après login réussi
+      await useAuthStore.getState().checkAuth();
       set({ authUser: response.data }); // Supposons que le backend renvoie { user, token }
       toast.success("Connecte avec succes");
     } catch (error) {
