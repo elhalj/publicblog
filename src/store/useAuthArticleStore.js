@@ -24,9 +24,19 @@ export const useAuthArticleStore = create((set) => ({
   getUserArticles: async () => {
     set({ isArticleLoading: true });
     try {
-      const response = await axios.get(`${VITE_API_ARTICLE_URL}/mesArticles`);
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Token non trouvé");
+
+      const response = await axios.get(`${VITE_API_ARTICLE_URL}/mesArticles`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Ajout crucial
+        },
+      });
+
+      console.log("Réponse API:", response.data); // Pour le débogage
+
       set({
-        userArticles: response.data,
+        userArticles: response.data || [],
       });
     } catch (error) {
       console.error("Échec de la récupération:", error);

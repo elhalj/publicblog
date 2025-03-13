@@ -36,7 +36,9 @@ function Page() {
             try {
 
 
-                await getUserArticles();
+                if (authUser?._id) { // Vérification explicite
+                    await getUserArticles();
+                }
 
 
             } catch (error) {
@@ -46,7 +48,7 @@ function Page() {
         };
 
         fetchData();
-    }, [authUser, getUserArticles]);
+    }, [authUser?._id]);
     console.log(userArticles)
 
     if (isArticleLoading) {
