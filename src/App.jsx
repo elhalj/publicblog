@@ -10,6 +10,7 @@ import Login from './pages/connecxion/Login';
 import SignUp from './pages/connecxion/SignUp';
 import { useAuthStore } from './store/useAuthStore';
 import { useEffect } from 'react';
+import { Loader } from 'lucide-react';
 
 export default function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore()

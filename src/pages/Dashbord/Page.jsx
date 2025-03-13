@@ -10,7 +10,7 @@ function Page() {
     const navigate = useNavigate()
     const { authUser } = useAuthStore();
     const { userArticles, getUserArticles, isArticleLoading } = useAuthArticleStore()
-    // const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
     // useEffect(() => {
@@ -35,7 +35,7 @@ function Page() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // setLoading(true);
+                setLoading(true);
 
                 if (authUser?._id) {
                     await getUserArticles(); // Passer l'ID explicitement
@@ -45,6 +45,8 @@ function Page() {
                 setError("Erreur de chargement");
                 console.error("Erreur:", error);
                 navigate("/login"); // Redirection si échec
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -52,7 +54,7 @@ function Page() {
     }, [authUser?._id, navigate, getUserArticles]);
     console.log(userArticles)
 
-    if (isArticleLoading) {
+    if (loading && isArticleLoading) {
         return (
             <div className="space-y-4">
                 <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse"></div>
