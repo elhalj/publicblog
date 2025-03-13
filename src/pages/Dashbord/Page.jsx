@@ -3,14 +3,13 @@ import { useAuthStore } from '../../store/useAuthStore'
 import ListeArticle from '../../components/users/ListeArticle';
 import { useAuthArticleStore } from '../../store/useAuthArticleStore';
 import ButtonAdd from '../../components/users/ButtonAdd';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
 function Page() {
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
     const { authUser } = useAuthStore();
     const { userArticles, getUserArticles, isArticleLoading } = useAuthArticleStore()
-    const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
     // useEffect(() => {
@@ -35,26 +34,22 @@ function Page() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setLoading(true);
 
-                if (authUser) {
-                    await getUserArticles(); // Passer l'ID explicitement
-                }
+
+                await getUserArticles();
+
 
             } catch (error) {
                 setError("Erreur de chargement");
                 console.error("Erreur:", error);
-                navigate("/login"); // Redirection si échec
-            } finally {
-                setLoading(false);
             }
         };
 
         fetchData();
-    }, [authUser, navigate, getUserArticles]);
+    }, [authUser, getUserArticles]);
     console.log(userArticles)
 
-    if (loading && isArticleLoading) {
+    if (isArticleLoading) {
         return (
             <div className="space-y-4">
                 <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse"></div>
@@ -75,7 +70,7 @@ function Page() {
         <div className='container'>
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-2xl font-bold">
-                    Bienvenue, {authUser?.name || 'Utilisateur'}
+                    Bienvenue, {authUser.name || 'Utilisateur'}
                 </h1>
                 <ButtonAdd />
             </div>
