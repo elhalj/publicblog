@@ -36,7 +36,9 @@ function Page() {
             try {
 
 
-                if (authUser?._id) { // Vérification explicite
+                if (!authUser?._id) { // Vérification explicite
+                    throw new Error('erreur authentification')
+                } else {
                     await getUserArticles();
                 }
 
