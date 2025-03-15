@@ -3,8 +3,6 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const VITE_API_ARTICLE_URL = import.meta.env.VITE_API_URL;
-// Dans Axios (frontend)
-axios.defaults.withCredentials = true;
 export const useAuthArticleStore = create((set) => ({
   articles: [],
   userArticles: [],
@@ -26,7 +24,14 @@ export const useAuthArticleStore = create((set) => ({
   getUserArticles: async () => {
     set({ isArticleLoading: true });
     try {
-      const response = await axios.get(`${VITE_API_ARTICLE_URL}/mesArticles`);
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Token non trouvé");
+
+      const response = await axios.get(`${VITE_API_ARTICLE_URL}/mesArticles`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Ajout crucial
+        },
+      });
 
       console.log("Réponse API:", response.data); // Pour le débogage
 
@@ -34,7 +39,7 @@ export const useAuthArticleStore = create((set) => ({
         userArticles: response.data || [],
       });
     } catch (error) {
-      console.error("Échec de la récupération:", error.message);
+      console.error("Échec de la récupération:", error);
       set({ userArticles: [] });
       toast.error(error.response?.data?.message || error.message);
     } finally {

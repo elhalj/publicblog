@@ -3,8 +3,7 @@ import toast from "react-hot-toast";
 import { create } from "zustand";
 
 const API_URL = import.meta.env.VITE_API_URL_AUTH;
-// Dans Axios (frontend)
-axios.defaults.withCredentials = true;
+
 export const useAuthStore = create((set) => ({
   authUser: null,
   isSignup: false,
@@ -13,19 +12,16 @@ export const useAuthStore = create((set) => ({
   isCheckingAuth: true,
 
   // Dans useAuthStore.js
-  // Modifiez la fonction checkAuth
   checkAuth: async () => {
     try {
-      const response = await axios.get(`${API_URL}/check`, {
-        withCredentials: true, // Ajout crucial
-      });
+      const response = await axios.get(`${API_URL}/check`);
 
-      if (response.data?.user) {
-        set({ authUser: response.data.user });
-      }
+      set({ authUser: response.data.user });
     } catch (error) {
+      console.error("Erreur checkAuth:", error.message);
       set({ authUser: null });
-      console.log(error.message);
+    } finally {
+      set({ isCheckingAuth: false });
     }
   },
 
@@ -47,13 +43,12 @@ export const useAuthStore = create((set) => ({
   login: async (data) => {
     set({ isLogin: true });
     try {
-      await axios.post(`${API_URL}/login`, data, {
-        withCredentials: true,
+      const response = await axios.post(`${API_URL}/login`, data, {
+        withCredentials: true, // Envoie les cookies
       });
-
-      // Force la vérification de l'authentification
+      // Appel checkAuth après login réussi
       await useAuthStore.getState().checkAuth();
-
+      set({ authUser: response.data }); // Supposons que le backend renvoie { user, token }
       toast.success("Connecte avec succes");
     } catch (error) {
       set({ authUser: null });
