@@ -47,7 +47,7 @@ export const useAuthStore = create((set) => ({
         withCredentials: true, // Envoie les cookies
       });
       // Appel checkAuth après login réussi
-      await useAuthStore.checkAuth();
+      await useAuthStore.getState().checkAuth();
       set({ authUser: response.data }); // Supposons que le backend renvoie { user, token }
       toast.success("Connecte avec succes");
     } catch (error) {
