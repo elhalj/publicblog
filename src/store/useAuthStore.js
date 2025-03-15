@@ -19,11 +19,7 @@ export const useAuthStore = create((set) => ({
         withCredentials: true, // Nécessaire pour les cookies
       });
 
-      if (response.data.success) {
-        set({ authUser: response.data.user });
-      } else {
-        set({ authUser: null });
-      }
+      set({ authUser: response.data.user });
     } catch (error) {
       console.error(
         "Erreur checkAuth:",
