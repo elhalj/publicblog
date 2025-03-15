@@ -13,16 +13,19 @@ export const useAuthStore = create((set) => ({
   isCheckingAuth: true,
 
   // Dans useAuthStore.js
+  // Modifiez la fonction checkAuth
   checkAuth: async () => {
     try {
-      const response = await axios.get(`${API_URL}/check`);
+      const response = await axios.get(`${API_URL}/check`, {
+        withCredentials: true, // Ajout crucial
+      });
 
-      set({ authUser: response.data });
+      if (response.data?.user) {
+        set({ authUser: response.data.user });
+      }
     } catch (error) {
-      console.error("Erreur checkAuth:", error.message);
       set({ authUser: null });
-    } finally {
-      set({ isCheckingAuth: false });
+      console.log(error.message);
     }
   },
 
@@ -44,12 +47,13 @@ export const useAuthStore = create((set) => ({
   login: async (data) => {
     set({ isLogin: true });
     try {
-      const response = await axios.post(`${API_URL}/login`, data, {
-        withCredentials: true, // Envoie les cookies
+      await axios.post(`${API_URL}/login`, data, {
+        withCredentials: true,
       });
-      // Appel checkAuth après login réussi
+
+      // Force la vérification de l'authentification
       await useAuthStore.getState().checkAuth();
-      set({ authUser: response.data }); // Supposons que le backend renvoie { user, token }
+
       toast.success("Connecte avec succes");
     } catch (error) {
       set({ authUser: null });
