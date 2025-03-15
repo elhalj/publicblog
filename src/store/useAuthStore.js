@@ -13,18 +13,12 @@ export const useAuthStore = create((set) => ({
 
   // Dans useAuthStore.js
   checkAuth: async () => {
-    set({ isCheckingAuth: true });
     try {
-      const response = await axios.get(`${API_URL}/checkAuth`, {
-        withCredentials: true, // Nécessaire pour les cookies
-      });
+      const response = await axios.get(`${API_URL}/checkAuth`);
 
-      set({ authUser: response.data.user });
+      set({ authUser: response.data });
     } catch (error) {
-      console.error(
-        "Erreur checkAuth:",
-        error.response?.data?.message || error.message
-      );
+      console.error("Erreur checkAuth:", error.message);
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });

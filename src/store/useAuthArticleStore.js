@@ -32,7 +32,7 @@ export const useAuthArticleStore = create((set) => ({
         userArticles: response.data || [],
       });
     } catch (error) {
-      console.error("Échec de la récupération:", error);
+      console.error("Échec de la récupération:", error.message);
       set({ userArticles: [] });
       toast.error(error.response?.data?.message || error.message);
     } finally {
