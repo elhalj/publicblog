@@ -3,6 +3,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const VITE_API_ARTICLE_URL = import.meta.env.VITE_API_URL;
+// Dans Axios (frontend)
+axios.defaults.withCredentials = true;
 export const useAuthArticleStore = create((set) => ({
   articles: [],
   userArticles: [],
