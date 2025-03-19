@@ -50,7 +50,7 @@ function Page() {
         };
 
         fetchData();
-    }, [authUser?._id]);
+    }, [authUser?._id, getUserArticles]);
     console.log(userArticles)
 
     if (isArticleLoading) {
