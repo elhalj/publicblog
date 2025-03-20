@@ -41,7 +41,7 @@ function Page() {
 
         const fetchData = async () => {
             try {
-                if (!authUser?.user._id) return
+                if (!authUser?._id) return
 
                 await getUserArticles()
 
@@ -56,7 +56,7 @@ function Page() {
         fetchData()
 
         return () => { isMounted = false } // Cleanup
-    }, [authUser?.user._id, getUserArticles]);
+    }, [authUser?._id, getUserArticles]);
     console.log(userArticles)
 
     if (isArticleLoading) {
@@ -80,7 +80,7 @@ function Page() {
         <div className='container'>
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-2xl font-bold">
-                    Bienvenue, {authUser?.user.name || 'Utilisateur'}
+                    Bienvenue, {authUser?.name || 'Utilisateur'}
                 </h1>
                 <ButtonAdd />
             </div>
@@ -99,7 +99,7 @@ function Page() {
                 )}
                 <div>
                     <button
-                        className="flex gag-2 border-1 border-amber-600"
+                        className="flex gag-2 border-1 border-amber-600 bg-black"
                         onClick={logout}
                         to="/login"
                     >
