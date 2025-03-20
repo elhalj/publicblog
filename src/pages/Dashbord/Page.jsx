@@ -8,8 +8,9 @@ import { Loader2 } from 'lucide-react';
 
 function Page() {
     // const navigate = useNavigate()
-    const { authUser, checkAuth, userInfo } = useAuthStore();
-    const { userArticles, getUserArticles, isArticleLoading } = useAuthArticleStore()
+    const { authUser } = useAuthStore();
+    const { userArticles = [], getUserArticles, isArticleLoading } = useAuthArticleStore()
+
     const [error, setError] = useState(null)
 
     // useEffect(() => {
@@ -32,27 +33,26 @@ function Page() {
 
     // }, [checkAuth, getUserArticles])
     useEffect(() => {
+        let isMounted = true // Pour éviter les fuites mémoire
+
         const fetchData = async () => {
             try {
+                if (!authUser?._id) return
 
-
-                if (!authUser) { // Vérification explicite
-                    throw new Error('erreur authentification')
-                } else {
-                    await checkAuth;
-                    await getUserArticles();
-                    userInfo(authUser._id)
-                }
-
+                await getUserArticles()
 
             } catch (error) {
-                setError("Erreur de chargement");
-                console.error("Erreur:", error);
+                if (isMounted) {
+                    setError("Erreur de chargement");
+                    console.error("Erreur:", error);
+                }
             }
         };
 
-        fetchData();
-    }, [authUser, getUserArticles, checkAuth, userInfo]);
+        fetchData()
+
+        return () => { isMounted = false } // Cleanup
+    }, [authUser?._id, getUserArticles]);
     console.log(userArticles)
 
     if (isArticleLoading) {
