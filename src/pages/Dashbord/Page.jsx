@@ -4,14 +4,18 @@ import ListeArticle from '../../components/users/ListeArticle';
 import { useAuthArticleStore } from '../../store/useAuthArticleStore';
 import ButtonAdd from '../../components/users/ButtonAdd';
 // import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, LogOut } from 'lucide-react';
 
 function Page() {
     // const navigate = useNavigate()
-    const { authUser } = useAuthStore();
+    const { authUser, logout } = useAuthStore();
     const { userArticles = [], getUserArticles, isArticleLoading } = useAuthArticleStore()
 
     const [error, setError] = useState(null)
+
+    // const handleLogout = async () => {
+    //     await logout()
+    // }
 
     // useEffect(() => {
     //     const fetchData = async () => {
@@ -93,6 +97,16 @@ function Page() {
                         </p>
                     </div>
                 )}
+                <div>
+                    <button
+                        className="flex gag-2 border-1 border-amber-600"
+                        onClick={logout}
+                        to="/login"
+                    >
+                        <LogOut />
+                        Logout
+                    </button>
+                </div>
             </div>
         </div>
     )
