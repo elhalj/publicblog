@@ -17,8 +17,9 @@ function ArticleForm({ article }) {
             tags: [],
             content: "",
             imageUrl: "",
-            statut: "",
+            statut: "brouillon", // Valeur par défaut plus logique
             slug: "",
+            ...article // Spread des valeurs existantes si article existe
         }
     );
 
@@ -26,7 +27,7 @@ function ArticleForm({ article }) {
         const { name, value } = e.target;
 
         if (name === "category" || name === "tags") {
-            const arrayValue = value.split(",").map((item) => item.trim());
+            const arrayValue = value.split(/,\s*/); // Gère les espaces après les virgules
             setFormData((prev) => ({ ...prev, [name]: arrayValue }));
         } else {
             setFormData((prev) => ({ ...prev, [name]: value }));
@@ -40,7 +41,9 @@ function ArticleForm({ article }) {
             // setFormData(response.data)
             const data = {
                 ...formData,
-                tags: formData.tags.split(", ").map((tag) => tag.trim()),
+                tags: Array.isArray(formData.tags)
+                    ? formData.tags
+                    : formData.tags.split(",").map(tag => tag.trim()),
             };
 
             if (article) {
@@ -93,7 +96,7 @@ function ArticleForm({ article }) {
                     <input
                         type="text"
                         name="category"
-                        value={formData.category.join(", ")}
+                        value={Array.isArray(formData.category) ? formData.category.join(", ") : ""}
                         onChange={handleChange}
                     />
                     <span>*"Technologie", "Santé", "Éducation", "Voyage"*</span>
@@ -104,7 +107,7 @@ function ArticleForm({ article }) {
                     <input
                         type="text"
                         name="tags"
-                        value={formData.tags.join(", ")}
+                        value={Array.isArray(formData.tags) ? formData.tags.join(", ") : ""}
                         onChange={handleChange}
                     />
                 </label>
