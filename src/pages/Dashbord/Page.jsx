@@ -80,7 +80,7 @@ function Page() {
         <div className='container'>
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-2xl font-bold">
-                    Bienvenue, {authUser?.name || 'Utilisateur'}
+                    Bienvenue, {authUser.name || 'Utilisateur'}
                 </h1>
                 <ButtonAdd />
             </div>
