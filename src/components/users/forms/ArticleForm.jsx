@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useAuthArticleStore } from "../../../store/useAuthArticleStore";
 import { Loader, Loader2 } from "lucide-react";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 // const VITE_API_ADD = import.meta.env.VITE_API_URL
 
 function ArticleForm({ article }) {
-    const { addArticle, updateArticle, isArticleLoading } = useAuthArticleStore();
+    const { addArticle, updateArticle, isArticleLoading, userArticles = [] } = useAuthArticleStore();
+    const { authUser, checkAuth } = useAuthStore()
 
     const [formData, setFormData] = useState(
         article || {
@@ -55,6 +57,10 @@ function ArticleForm({ article }) {
             console.error(error.message);
         }
     };
+
+    useEffect(() => {
+        checkAuth()
+    }, [userArticles, checkAuth, authUser])
 
     return (
         <div>
