@@ -54,7 +54,7 @@ function Acceuil() {
                     S'inscrire
                 </button>
             </div>
-
+            <div>{authUser && (<div>Bonjour {info.name}</div>)}</div>
             <AllPublicList />
         </>
     )

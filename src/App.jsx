@@ -11,6 +11,7 @@ import SignUp from './pages/connecxion/SignUp';
 import { useAuthStore } from './store/useAuthStore';
 import { useEffect } from 'react';
 import { Loader } from 'lucide-react';
+import { Toaster } from 'react-hot-toast';
 
 export default function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore()
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/articles/new" element={authUser ? <AddArticle /> : <Navigate to={"/login"} />} />
         <Route path="/articles/:id/edit" element={authUser ? <EditArticle /> : <Navigate to={"/login"} />} />
       </Routes>
+      <Toaster />
     </>
 
   );
