@@ -19,7 +19,6 @@ function ArticleForm({ article }) {
             imageUrl: "",
             statut: "brouillon", // Valeur par défaut plus logique
             slug: "",
-            ...article // Spread des valeurs existantes si article existe
         }
     );
 
