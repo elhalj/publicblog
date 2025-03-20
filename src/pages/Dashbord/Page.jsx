@@ -41,7 +41,7 @@ function Page() {
 
         const fetchData = async () => {
             try {
-                if (!authUser?._id) return
+                if (!authUser?.user._id) return
 
                 await getUserArticles()
 
@@ -56,7 +56,7 @@ function Page() {
         fetchData()
 
         return () => { isMounted = false } // Cleanup
-    }, [authUser?._id, getUserArticles]);
+    }, [authUser?.user._id, getUserArticles]);
     console.log(userArticles)
 
     if (isArticleLoading) {
