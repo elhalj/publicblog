@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react';
 
 function Page() {
     // const navigate = useNavigate()
-    const { authUser } = useAuthStore();
+    const { authUser, checkAuth, userInfo } = useAuthStore();
     const { userArticles, getUserArticles, isArticleLoading } = useAuthArticleStore()
     const [error, setError] = useState(null)
 
@@ -36,10 +36,12 @@ function Page() {
             try {
 
 
-                if (!authUser?._id) { // Vérification explicite
+                if (!authUser) { // Vérification explicite
                     throw new Error('erreur authentification')
                 } else {
+                    await checkAuth;
                     await getUserArticles();
+                    userInfo(authUser._id)
                 }
 
 
@@ -50,7 +52,7 @@ function Page() {
         };
 
         fetchData();
-    }, [authUser?._id, getUserArticles]);
+    }, [authUser, getUserArticles, checkAuth, userInfo]);
     console.log(userArticles)
 
     if (isArticleLoading) {
