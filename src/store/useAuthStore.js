@@ -3,87 +3,149 @@ import toast from "react-hot-toast";
 import { create } from "zustand";
 
 const API_URL = import.meta.env.VITE_API_URL_AUTH;
+const LOCAL_STORAGE_KEY = "authToken";
 
-export const useAuthStore = create((set) => ({
+// Intercepteur pour gérer les erreurs 401
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      useAuthStore.getState().logout();
+      toast.error("Session expirée, veuillez vous reconnecter");
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const useAuthStore = create((set, get) => ({
+  // État initial
   authUser: null,
-  isSignup: false,
-  isLogin: false,
-  isLogout: false,
-  isCheckingAuth: true,
+  token: localStorage.getItem(LOCAL_STORAGE_KEY) || null,
+  loadingStates: {
+    isCheckingAuth: false,
+    isSignup: false,
+    isLogin: false,
+  },
 
-  // Dans useAuthStore.js
+  // Méthode générique pour gérer les erreurs
+  handleError: (error, defaultMessage) => {
+    const message =
+      error.response?.data?.message || error.message || defaultMessage;
+    toast.error(message);
+    return message;
+  },
+
+  // Vérification de l'authentification
   checkAuth: async () => {
-    set({ isCheckingAuth: true });
+    set({ loadingStates: { ...get().loadingStates, isCheckingAuth: true } });
+
     try {
       const response = await axios.get(`${API_URL}/check`, {
-        withCredentials: true, // Nécessaire pour les cookies
+        headers: { "x-token": get().token },
+        withCredentials: true,
       });
 
-      set({ authUser: response.data });
+      set({
+        authUser: response.data,
+        token: response.headers["x-token"],
+      });
+      localStorage.setItem(LOCAL_STORAGE_KEY, response.headers["x-token"]);
     } catch (error) {
-      console.error(
-        "Erreur checkAuth:",
-        error.response?.data?.message || error.message
-      );
-      set({ authUser: null });
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      set({ authUser: null, token: null });
+      get().handleError(error, "Échec de vérification de l'authentification");
     } finally {
-      set({ isCheckingAuth: false });
+      set({ loadingStates: { ...get().loadingStates, isCheckingAuth: false } });
     }
   },
 
+  // Inscription
   signUp: async (data) => {
-    set({ isSignup: true });
+    set({ loadingStates: { ...get().loadingStates, isSignup: true } });
+
     try {
-      const response = await axios.post(`${API_URL}/signUp`, data);
-      set({ authUser: response.data });
-      toast.success("Compte créé avec succès");
+      const response = await axios.post(`${API_URL}/signUp`, data, {
+        withCredentials: true,
+      });
+
+      set({
+        authUser: response.data,
+        token: response.headers["x-token"],
+      });
+      localStorage.setItem(LOCAL_STORAGE_KEY, response.headers["x-token"]);
+      toast.success("Compte créé avec succès !");
     } catch (error) {
-      set({ authUser: null });
-      const errorMessage = error.response?.data?.message || "Erreur inconnue";
-      toast.error(errorMessage);
+      set({ authUser: null, token: null });
+      get().handleError(error, "Échec de la création du compte");
     } finally {
-      set({ isCheckingAuth: false, isSignup: false });
+      set({ loadingStates: { ...get().loadingStates, isSignup: false } });
     }
   },
 
+  // Connexion
   login: async (data) => {
-    set({ isLogin: true });
+    set({ loadingStates: { ...get().loadingStates, isLogin: true } });
+
     try {
       const response = await axios.post(`${API_URL}/login`, data, {
-        withCredentials: true, // Envoie les cookies
+        withCredentials: true,
       });
-      // Appel checkAuth après login réussi
-      await useAuthStore.getState().checkAuth();
-      set({ authUser: response.data }); // Supposons que le backend renvoie { user, token }
-      toast.success("Connecte avec succes");
+
+      set({
+        authUser: response.data,
+        token: response.headers["x-token"],
+      });
+      localStorage.setItem(LOCAL_STORAGE_KEY, response.headers["x-token"]);
+      toast.success("Connexion réussie !");
     } catch (error) {
-      set({ authUser: null });
-      const errorMessage =
-        error.response?.data?.message || "Erreur de connexion";
-      toast.error(errorMessage);
+      set({ authUser: null, token: null });
+      get().handleError(error, "Identifiants incorrects");
     } finally {
-      set({ isCheckingAuth: false, isLogin: false });
+      set({ loadingStates: { ...get().loadingStates, isLogin: false } });
     }
   },
 
+  // Déconnexion
   logout: async () => {
     try {
-      await axios.post(`${API_URL}/logout`);
-      set({ authUser: null });
-      toast.success("Deconnecte avec success");
+      await axios.post(`${API_URL}/logout`, null, {
+        headers: { "x-token": get().token },
+        withCredentials: true,
+      });
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Erreur de déconnexion";
-      toast.error(errorMessage);
+      get().handleError(error, "Problème lors de la déconnexion");
+    } finally {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      set({ authUser: null, token: null });
+      toast.success("Déconnexion réussie !");
     }
   },
 
-  userInfo: async (userId) => {
+  // Récupération des informations utilisateur
+  fetchUserInfo: async (userId) => {
     try {
-      const response = await axios.get(`${API_URL}/${userId}`);
+      const response = await axios.get(`${API_URL}/${userId}`, {
+        headers: { "x-token": get().token },
+      });
+
       set({ authUser: response.data });
     } catch (error) {
-      console.log("Error de token:", error.message);
+      get().handleError(error, "Échec du chargement du profil");
+      throw error;
     }
+  },
+
+  // Reset du state (pour les tests)
+  reset: () => {
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
+    set({
+      authUser: null,
+      token: null,
+      loadingStates: {
+        isCheckingAuth: false,
+        isSignup: false,
+        isLogin: false,
+      },
+    });
   },
 }));

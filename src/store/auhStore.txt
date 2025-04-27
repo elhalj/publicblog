@@ -1,0 +1,103 @@
+import axios from "axios";
+import toast from "react-hot-toast";
+import { create } from "zustand";
+
+const API_URL = import.meta.env.VITE_API_URL_AUTH;
+
+export const useAuthStore = create((set) => ({
+  authUser: null,
+  token: null,
+  isSignup: false,
+  isLogin: false,
+  isLogout: false,
+  isCheckingAuth: true,
+
+  checkAuth: async () => {
+    set({ isCheckingAuth: true });
+    try {
+      const savedToken = localStorage.getItem("authToken");
+      const response = await axios.get(`${API_URL}/check`, {
+        headers: { "x-token": savedToken },
+        withCredentials: true,
+      });
+
+      localStorage.setItem("authToken", response.headers["x-token"]);
+      set({ authUser: response.data, token: response.headers["x-token"] });
+    } catch (error) {
+      localStorage.removeItem("authToken");
+      console.error(
+        "Erreur checkAuth:",
+        error.response?.data?.message || error.message
+      );
+      set({ authUser: null, token: null });
+    } finally {
+      set({ isCheckingAuth: false });
+    }
+  },
+
+  signUp: async (data) => {
+    set({ isSignup: true });
+    try {
+      const response = await axios.post(`${API_URL}/signUp`, data, {
+        withCredentials: true,
+      });
+
+      localStorage.setItem("authToken", response.headers["x-token"]);
+      set({ authUser: response.data, token: response.headers["x-token"] });
+      toast.success("Compte créé avec succès");
+    } catch (error) {
+      set({ authUser: null, token: null });
+      const errorMessage = error.response?.data?.message || "Erreur inconnue";
+      toast.error(errorMessage);
+    } finally {
+      set({ isSignup: false });
+    }
+  },
+
+  login: async (data) => {
+    set({ isLogin: true });
+    try {
+      const response = await axios.post(`${API_URL}/login`, data, {
+        withCredentials: true,
+      });
+
+      set({ authUser: response.data, token: response.headers["x-token"] });
+      toast.success("Connecte avec succes");
+    } catch (error) {
+      set({ authUser: null, token: null });
+      const errorMessage =
+        error.response?.data?.message || "Erreur de connexion";
+      toast.error(errorMessage);
+    } finally {
+      set({ isCheckingAuth: false, isLogin: false });
+    }
+  },
+
+  logout: async () => {
+    try {
+      await axios.post(`${API_URL}/logout`, null, {
+        headers: { "x-token": get().token }, // Utilisation de get()
+      });
+      localStorage.removeItem("authToken");
+      set({ authUser: null, token: null });
+      toast.success("Deconnecte avec success");
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Erreur de déconnexion";
+      toast.error(errorMessage);
+    }
+  },
+
+  userInfo: async (userId) => {
+    try {
+      const response = await axios.get(`${API_URL}/${userId}`, {
+        headers: { "x-token": useAuthStore.getState().token },
+      });
+
+      set({ authUser: response.data });
+    } catch (error) {
+      console.log("Error de token:", error.message);
+    }
+  },
+}));
+
