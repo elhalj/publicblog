@@ -21,11 +21,9 @@ export const useAuthStore = create((set, get) => ({
   // État initial
   authUser: null,
   token: localStorage.getItem(LOCAL_STORAGE_KEY) || null,
-  loadingStates: {
-    isCheckingAuth: false,
-    isSignup: false,
-    isLogin: false,
-  },
+  isCheckingAuth: false,
+  isSignup: false,
+  isLogin: false,
 
   // Méthode générique pour gérer les erreurs
   handleError: (error, defaultMessage) => {
@@ -37,7 +35,7 @@ export const useAuthStore = create((set, get) => ({
 
   // Vérification de l'authentification
   checkAuth: async () => {
-    set({ loadingStates: { ...get().loadingStates, isCheckingAuth: true } });
+    set({ isCheckingAuth: true });
 
     try {
       const response = await axios.get(`${API_URL}/check`, {
@@ -55,13 +53,13 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: null, token: null });
       get().handleError(error, "Échec de vérification de l'authentification");
     } finally {
-      set({ loadingStates: { ...get().loadingStates, isCheckingAuth: false } });
+      set({ isCheckingAuth: false });
     }
   },
 
   // Inscription
   signUp: async (data) => {
-    set({ loadingStates: { ...get().loadingStates, isSignup: true } });
+    set({ isSignup: true });
 
     try {
       const response = await axios.post(`${API_URL}/signUp`, data, {
@@ -78,13 +76,13 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: null, token: null });
       get().handleError(error, "Échec de la création du compte");
     } finally {
-      set({ loadingStates: { ...get().loadingStates, isSignup: false } });
+      set({ isSignup: false });
     }
   },
 
   // Connexion
   login: async (data) => {
-    set({ loadingStates: { ...get().loadingStates, isLogin: true } });
+    set({ isLogin: true });
 
     try {
       const response = await axios.post(`${API_URL}/login`, data, {
@@ -101,7 +99,7 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: null, token: null });
       get().handleError(error, "Identifiants incorrects");
     } finally {
-      set({ loadingStates: { ...get().loadingStates, isLogin: false } });
+      set({ isLogin: false });
     }
   },
 
